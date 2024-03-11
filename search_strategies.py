@@ -28,12 +28,12 @@ def dfs(debug_flag: int, depth_limit: int = None):
     queue = [start_node]  # Очередь для хранения узлов
     result_node = None  # Переменная для хранения результата
     iterations = 0  # Счетчик итераций
-    dls.limit_reached = False  # Ограничитель на рекурсию
+    defining_sequences.limit_reached = False  # Ограничитель на рекурсию
 
     START_TIME = process_time()
     # Основной цикл алгоритма
     while queue:
-        result_node, iterations = dls(queue.pop(0), visited_states, queue, iterations, depth_limit)
+        result_node, iterations = defining_sequences(queue.pop(0), visited_states, queue, iterations, depth_limit)
         if result_node is not None:
             break
 
@@ -51,7 +51,7 @@ def dfs(debug_flag: int, depth_limit: int = None):
         print("\nВсе состояния были исследованы, но решение не было найдено.")
 
 
-def dls(current_node: "Node", visited_states: set,
+def defining_sequences(current_node: "Node", visited_states: set,
         queue: list, iterations: int, depth_limit: int = None):
     """
     Рекурсивная часть алгоритма поиска в глубину.
@@ -79,10 +79,10 @@ def dls(current_node: "Node", visited_states: set,
 
     # Проверка для ограниченного по глубине поиска
     if depth_limit is not None and current_node.depth >= depth_limit:
-        if not dls.limit_reached:
+        if not defining_sequences.limit_reached:
             print("\nДостигнуто ограничение глубины!")
             queue.clear()  # Очищаем очередь
-            dls.limit_reached = True  # Меняем флаг достижения глубины
+            defining_sequences.limit_reached = True  # Меняем флаг достижения глубины
         return None, iterations
 
     new_states_dict = get_followers(current_node.current_state)  # Получаем новые состояния из текущего узла
@@ -114,7 +114,7 @@ def dls(current_node: "Node", visited_states: set,
 
     # Рекурсивно переходим к обработке полученных потомков, удаляя их постепенно из очереди
     while queue:
-        result_node, iterations = dls(queue.pop(0), visited_states, queue, iterations, depth_limit)
+        result_node, iterations = defining_sequences(queue.pop(0), visited_states, queue, iterations, depth_limit)
         if result_node is not None:
             return result_node, iterations
 
