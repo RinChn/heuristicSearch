@@ -28,7 +28,6 @@ if __name__ == '__main__':
                     search(debug_flag, depth_limit)
                 elif h_flag == '1' or h_flag == '2':
                     search(debug_flag, depth_limit, h_flag=int(h_flag))
-
                 else:
                     print("Некорректный ввод")
             case '3':
