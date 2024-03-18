@@ -1,7 +1,5 @@
 from tabulate import tabulate
-
-from search_strategies import dfs
-
+from search_strategies import search
 
 if __name__ == '__main__':
     repeat = 'Y'
@@ -14,12 +12,25 @@ if __name__ == '__main__':
 
         match mode:
             case '1':
-                debug_flag = input("\nРежим поэтапного вывода (Y/N):\n> ") == 'Y'
-                dfs(debug_flag)
+                debug_flag = input("\nРежим пошагового вывода (Y/N):\n> ") == 'Y'
+                h_flag = input("\nЭвристическая функция h: (1/2/N)\n> ")
+                if h_flag == 'N':
+                    search(debug_flag)
+                elif h_flag == '1' or h_flag == '2':
+                    search(debug_flag, h_flag=int(h_flag))
+                else:
+                    print("Некорректный ввод")
             case '2':
-                debug_flag = input("\nРежим поэтапного вывода (Y/N):\n> ") == 'Y'
+                debug_flag = input("\nРежим пошагового вывода (Y/N):\n> ") == 'Y'  
                 depth_limit = int(input("Введите ограничение на глубину:\n> "))
-                dfs(debug_flag, depth_limit)
+                h_flag = input("\nЭвристическая функция h: (1/2/N)\n> ")
+                if h_flag == 'N':
+                    search(debug_flag, depth_limit)
+                elif h_flag == '1' or h_flag == '2':
+                    search(debug_flag, depth_limit, h_flag=int(h_flag))
+
+                else:
+                    print("Некорректный ввод")
             case '3':
                 print(tabulate(
                          [["DFS",
