@@ -17,15 +17,18 @@ def get_initial_state() -> list:
     Получение начального состояния.
     :return: Начальное состояние.
     """
+    # Замена любых двух ячеек приводит к решению.
+    #
+    # Например:
     # return [
     #     [5, 6, 4],
     #     [2, 3, 8],
     #     [7, 1, 0]
     # ]
     return [
-        [5, 6, 4],
-        [2, 3, 0],
-        [7, 1, 8]
+        [3, 6, 4],
+        [2, 5, 8],
+        [7, 1, 0]
     ]
 
 
@@ -34,16 +37,11 @@ def get_finish_state() -> list:
     Получение конечного состояния.
     :return: Конечное состояние.
     """
-    # return [
-    #     [0, 1, 2],
-    #     [3, 4, 5],
-    #     [6, 7, 8]
-    # ]
     return [
-        [5, 6, 4],
-        [2, 3, 8],
-        [7, 1, 0]
-    ]
+         [0, 1, 2],
+         [3, 4, 5],
+         [6, 7, 8]
+     ]
 
 
 def print_path(node: "Node"):
@@ -61,13 +59,12 @@ def print_path(node: "Node"):
 
     for path_node in path[::-1]:
         print_node(path_node)
-        print("^\n:\n:\n_\n")
+        print("_\n:\n:\nV\n")
 
 
-def print_node(node: "Node", is_duplicate: bool = False):
+def print_node(node: "Node"):
     """
     Вывод информации об узле на экран.
-    :param is_duplicate: Является ли состояние в узле повторным.
     :param node: Узел, информация о котором выводится.
     """
     parent_id = 0
@@ -83,9 +80,7 @@ def print_node(node: "Node", is_duplicate: bool = False):
           f"Action = {node_prev_action}, \nDepth = {node.depth}, " +
           f"Cost = {node.path_cost}, \nState: ")
     print_state(node.current_state)
-    if is_duplicate:
-        print("Повторное состояние")
-    print()
+    #print()
 
 
 def print_state(state: list):
