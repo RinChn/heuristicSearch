@@ -74,13 +74,12 @@ def print_node(node: "Node"):
 
     node_prev_action = None
     if node.previous_action:
-        node_prev_action = MOVES[node.previous_action]
+        node_prev_action = MOVES[*node.previous_action]
 
     print(f"ID = {node.node_id}, ParentID = {parent_id}, " +
           f"Action = {node_prev_action}, \nDepth = {node.depth}, " +
           f"Cost = {node.path_cost}, \nState: ")
     print_state(node.current_state)
-    #print()
 
 
 def print_state(state: list):
@@ -120,15 +119,16 @@ def state_swap(descendant: dict, current_state: list, move: tuple, pos_i: int, p
         descendant[move] = new_state
 
 
-def get_empty_cell(state: list) -> tuple[int, int]:
+def get_coordinates_cell(state: list, value: int):
     """
-    Получение координат пустой ячейки.
+    Получение координат ячейки, содержащей нужное значение.
+    :param value: Искомое значение.
     :param state: Состояние для поиска.
-    :return: Координаты пустой ячейки.
+    :return: Координаты ячейки.
     """
     for i in range(3):
         for j in range(3):
-            if state[i][j] == 0:
+            if state[i][j] == value:
                 return i, j
 
 
@@ -139,7 +139,7 @@ def get_followers(current_state: list) -> dict[tuple, list[Node]]:
     :return: Последователи.
     """
     new_states = {}
-    pos_i, pos_j = get_empty_cell(current_state)
+    pos_i, pos_j = get_coordinates_cell(current_state, 0)
     for move, action in MOVES.items():
         state_swap(new_states, current_state, move, pos_i, pos_j)
     return new_states
