@@ -191,7 +191,7 @@ def defining_sequences(current_node: "Node", visited_states: set,
 
             stack.append(child_node)  # Помещаем узел в стек
         elif DEBUG:
-            print(f"\nПовторное состояние: \nAction = {MOVES[child_action]}, \nState: ")
+            print(f"Повторное состояние: \nAction = {MOVES[child_action]}, \nState: ")
             print_state(child_state)
             print()
     if DEBUG:
