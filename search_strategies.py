@@ -150,11 +150,11 @@ def defining_sequences(current_node: "Node", visited_states: set,
     # (приоритет - состояние суммой наименьшего з-я эвристической ф-ции и стоимости пути до тек. узла)
     if h_flag == 1:
         new_states_sorted = sorted(new_states_dict.items(),
-                                   key=lambda item: h1(item[1])+current_node.path_cost,
+                                   key=lambda item: h1(item[1])+current_node.path_cost+1,
                                    reverse=True)
     elif h_flag == 2:
         new_states_sorted = sorted(new_states_dict.items(),
-                                   key=lambda item: h2(item[1])+current_node.path_cost,
+                                   key=lambda item: h2(item[1])+current_node.path_cost+1,
                                    reverse=True)
     else:
         # Если выбрана другая эвристика или она не выбрана, не выполняем сортировку
