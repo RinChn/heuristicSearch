@@ -111,7 +111,6 @@ def search(debug_flag: int, depth_limit: int = None, h_flag: int = None):
     else:
         print("\nПуть к конечному состоянию не найден.")
 
-
 def defining_sequences(current_node: "Node", visited_states: set,
                        stack: list, iterations: int, depth_limit: int = None,
                        h_flag: int = None):
@@ -148,14 +147,14 @@ def defining_sequences(current_node: "Node", visited_states: set,
     new_states_dict = get_followers(current_node.current_state)  # Получаем новые состояния из текущего узла
 
     # Сортировка в соответствии с выбранной функцией h в обратном порядке
-    # (приоритет - состояние с наименьшим з-м эвристической ф-ции)
+    # (приоритет - состояние суммой наименьшего з-я эвристической ф-ции и стоимости пути до тек. узла)
     if h_flag == 1:
         new_states_sorted = sorted(new_states_dict.items(),
-                                   key=lambda item: h1(item[1]),
+                                   key=lambda item: h1(item[1])+current_node.path_cost,
                                    reverse=True)
     elif h_flag == 2:
         new_states_sorted = sorted(new_states_dict.items(),
-                                   key=lambda item: h2(item[1]),
+                                   key=lambda item: h2(item[1])+current_node.path_cost,
                                    reverse=True)
     else:
         # Если выбрана другая эвристика или она не выбрана, не выполняем сортировку
@@ -180,15 +179,15 @@ def defining_sequences(current_node: "Node", visited_states: set,
             if DEBUG:
                 print_node(child_node)  # Выводим информацию о потомке
                 if h_flag == 1:
-                    print("\nЗначение эвристической функции h1:", h1(child_node.current_state, print_flag=True))
+                    print("\nЗначение эвристической функции h1:", h1(child_node.current_state, print_flag=True)+child_node.path_cost)
                 elif h_flag == 2:
                     print("\nЗначение эвристической функции h2:",
-                          h2(child_node.current_state, print_flag=True))
+                          h2(child_node.current_state, print_flag=True)+child_node.path_cost)
                 print()
 
             stack.append(child_node)  # Помещаем узел в стек
         elif DEBUG:
-            print(f"Повторное состояние: \nAction = {MOVES[child_action]}, \nState: ")
+            print(f"\nПовторное состояние: \nAction = {MOVES[child_action]}, \nState: ")
             print_state(child_state)
             print()
     if DEBUG:
