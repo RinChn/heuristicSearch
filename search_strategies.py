@@ -13,8 +13,8 @@ def h1(state, print_flag: bool = False):
     """
     Эвристическая функция h1.
     :param state: Текущее состояние.
-    :param print_flag: Флаг вывода фишек и их присутствия/отусутствия на нужных позициях.
-    :return: количество фишек, стоящих не на своем месте.
+    :param print_flag: Флаг вывода фишек и их присутствия/отсутствия на нужных позициях.
+    :return: Количество фишек, стоящих не на своем месте.
     """
     # Получаем целевое состояние игры
     target_state = get_finish_state()
@@ -72,31 +72,29 @@ def h2(state: list, print_flag: bool = False) -> int:
     return total_distance
 
 
-def search(debug_flag: int, depth_limit: int = None, h_flag: int = None):
+def search(debug_flag: int, h_flag: int = None):
     """
-    Поиск в глубину.
+    Поиск А*: подготовка структур данных, запуск поиска.
     :param debug_flag: Выбор пользователя относительно пошагового вывода поиска.
-    :param depth_limit: Ограничение для поиска с ограничением глубины.
     :param h_flag: Флаг выбора эвристической функции.
     """
     global DEBUG
     DEBUG = debug_flag
 
-    if depth_limit:
-        print("\n\nПОИСК В ГЛУБИНУ С ОГРАНИЧЕНИЕМ DLS — Deep-Limited Search.")
-    else:
-        print("\n\nПОИСК СНАЧАЛА В ГЛУБИНУ DFS — Depth-first Search.")
+    print("\n\nЭВРИСТИЧЕСКИЙ ПОИСК А*.")
+
     start_node = Node(get_initial_state(), None, None, 0, 0)  # Начальный узел
     visited_states = set()  # Множество посещенных состояний
-    stack = [start_node]  # стек для хранения узлов
+    queue = [start_node]  # Очередь с приоритетом для хранения узлов
     result_node = None  # Переменная для хранения результата
     iterations = 0  # Счетчик итераций
     defining_sequences.limit_reached = False  # Ограничитель на рекурсию
 
     start_time = process_time()
+
     # Основной цикл алгоритма
-    while stack:
-        result_node, iterations = defining_sequences(stack.pop(), visited_states, stack, iterations, depth_limit,
+    while queue:
+        result_node, iterations = defining_sequences(queue.pop(0), visited_states, queue, iterations,
                                                      h_flag)
         if result_node is not None:
             break
@@ -111,16 +109,16 @@ def search(debug_flag: int, depth_limit: int = None, h_flag: int = None):
     else:
         print("\nПуть к конечному состоянию не найден.")
 
+
 def defining_sequences(current_node: "Node", visited_states: set,
-                       stack: list, iterations: int, depth_limit: int = None,
+                       stack: list, iterations: int,
                        h_flag: int = None):
     """
-    Рекурсивная часть алгоритма поиска в глубину с учетом выбранной эвристики.
+    Рекурсивная часть алгоритма поиска А* с учетом выбранной эвристики.
     :param current_node: Текущий обрабатываемый узел.
     :param visited_states: Список посещённых состояний.
     :param stack: Стек узлов.
     :param iterations: Количество прошедших итераций.
-    :param depth_limit: Ограничение в глубину для поиска с ограничением.
     :param h_flag: Флаг выбора эвристической функции.
     :return: Найденное конечное состояние и затраченное для этого количество итераций.
     """
@@ -136,33 +134,12 @@ def defining_sequences(current_node: "Node", visited_states: set,
     # Добавляем текущее состояние в множество посещенных
     visited_states.add(state_hash_value)
 
-    # Проверка для ограниченного по глубине поиска
-    if depth_limit is not None and current_node.depth >= depth_limit:
-        if not defining_sequences.limit_reached:
-            print("\nДостигнуто ограничение глубины!")
-            stack.clear()  # Очищаем стек
-            defining_sequences.limit_reached = True  # Меняем флаг достижения глубины
-        return None, iterations
-
-    new_states_dict = get_followers(current_node.current_state)  # Получаем новые состояния из текущего узла
-
-    # Сортировка в соответствии с выбранной функцией h в обратном порядке
-    # (приоритет - состояние суммой наименьшего з-я эвристической ф-ции и стоимости пути до тек. узла)
-    if h_flag == 1:
-        new_states_sorted = sorted(new_states_dict.items(),
-                                   key=lambda item: h1(item[1])+current_node.path_cost+1,
-                                   reverse=True)
-    elif h_flag == 2:
-        new_states_sorted = sorted(new_states_dict.items(),
-                                   key=lambda item: h2(item[1])+current_node.path_cost+1,
-                                   reverse=True)
-    else:
-        # Если выбрана другая эвристика или она не выбрана, не выполняем сортировку
-        new_states_sorted = new_states_dict.items()
+    # Получаем новые состояния из текущего узла
+    new_states_dict = get_followers(current_node.current_state)
 
     # Отладочный вывод текущего узла и всех его потомков по шагам
     if DEBUG:
-        print(f"----------------Шаг {iterations}.---------------- \n")
+        print(f"\n----------------Шаг {iterations}.---------------- \n")
         print("Текущий узел:", end=' ')
         if iterations == 1:
             print("Корень дерева")
@@ -170,7 +147,7 @@ def defining_sequences(current_node: "Node", visited_states: set,
         print("\nПотомки:")
 
     # Исследуем каждого потомка
-    for child_action, child_state in new_states_sorted:
+    for child_action, child_state in new_states_dict.items():
         # Хэшируем состояние и инициализируем как узел
         child_hash_value = state_hash(child_state)
         if child_hash_value not in visited_states:
@@ -179,24 +156,34 @@ def defining_sequences(current_node: "Node", visited_states: set,
             if DEBUG:
                 print_node(child_node)  # Выводим информацию о потомке
                 if h_flag == 1:
-                    print("\nЗначение эвристической функции h1:", h1(child_node.current_state, print_flag=True)+child_node.path_cost)
+                    print("\nЗначение эвристической функции h1:",
+                          h1(child_node.current_state, print_flag=True)
+                          + child_node.path_cost)
                 elif h_flag == 2:
                     print("\nЗначение эвристической функции h2:",
-                          h2(child_node.current_state, print_flag=True)+child_node.path_cost)
+                          h2(child_node.current_state, print_flag=True)
+                          + child_node.path_cost)
                 print()
 
-            stack.append(child_node)  # Помещаем узел в стек
+            stack.append(child_node)  # Помещаем узел в очередь
+            # Сортировка в соответствии с выбранной функцией h в обратном порядке
+            # (приоритет - состояние суммой наименьшего з-я эвристической ф-ции и стоимости пути до тек. узла)
+            if h_flag == 1:
+                stack = sorted(stack,
+                               key=lambda item: h1(item.current_state) + child_node.path_cost)
+            elif h_flag == 2:
+                stack = sorted(stack,
+                               key=lambda item: h2(item.current_state) + child_node.path_cost)
+
         elif DEBUG:
             print(f"\nПовторное состояние: \nAction = {MOVES[child_action]}, \nState: ")
             print_state(child_state)
-            print()
     if DEBUG:
-        input("Нажмите 'Enter' для продолжения...")
+        input("\nНажмите 'Enter' для продолжения...")
 
     # Рекурсивно переходим к обработке полученных потомков, удаляя их постепенно из очереди
     while stack:
-        result_node, iterations = defining_sequences(stack.pop(), visited_states, stack, iterations, depth_limit,
-                                                     h_flag)
+        result_node, iterations = defining_sequences(stack.pop(0), visited_states, stack, iterations, h_flag)
         if result_node is not None:
             return result_node, iterations
 
