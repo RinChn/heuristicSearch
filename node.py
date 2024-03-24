@@ -8,10 +8,11 @@ class Node:
     path_cost: int = 0  # Стоимость пути от начального узла к данному
     depth: int = 0  # Глубина узла
     node_id: int = 0  # ID узла (его индекс в общем массиве узлов)
-
+    node_f: int = 0 # Значение функции f(n)
+    
     nodes_count = 0  # Общее количество представителей класса
 
-    def __init__(self, state: list, parent: "Node", action: tuple, cost: int, depth: int):
+    def __init__(self, state: list, parent: "Node", action: tuple, cost: int, depth: int, f: int):
         """
         Конструктор класса.
         :param state: Текущее состояние.
@@ -26,6 +27,7 @@ class Node:
         self.path_cost = cost
         self.depth = depth
         self.node_id = Node.nodes_count
+        self.node_f = f
 
         Node.nodes_count += 1
 
