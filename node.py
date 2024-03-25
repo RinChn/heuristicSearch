@@ -7,8 +7,8 @@ class Node:
     previous_action: tuple = None  # Действие, применённое к родительскому узлу для получения текущего узла
     path_cost: int = 0  # Стоимость пути от начального узла к данному
     depth: int = 0  # Глубина узла
-    node_id: int = 0  # ID узла (его индекс в общем массиве узлов)
-    node_f: int = 0  # Значение функции f(n)
+    id: int = 0  # ID узла (его индекс в общем массиве узлов)
+    heuristic_function: int = 0  # Значение эвристической функции узла
     
     nodes_count = 0  # Общее количество представителей класса
 
@@ -26,8 +26,8 @@ class Node:
         self.previous_action = action
         self.path_cost = cost
         self.depth = depth
-        self.node_id = Node.nodes_count
-        self.node_f = f
+        self.id = Node.nodes_count
+        self.heuristic_function = f
 
         Node.nodes_count += 1
 
