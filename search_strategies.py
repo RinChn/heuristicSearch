@@ -167,7 +167,6 @@ def defining_sequences(current_node: "Node", visited_states: set,
 
             if DEBUG:
                 print_node(child_node)  # Выводим информацию о потомке
-            if DEBUG:
                 print()
 
             if greedy_flag and child_node.cost_estimation < current_node.cost_estimation:
