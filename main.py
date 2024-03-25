@@ -3,7 +3,11 @@ from search_strategies import search
 from basic_operations import get_initial_state, get_finish_state
 
 
-def input_h() -> str:
+def input_h():
+    """
+    Функция ввода эвристической функции.
+    :return: Номер используемой эвристической функции.
+    """
     h = input("\nЭвристическая функция h: (1/2)\n> ")
     while h != '1' and h != '2':
         print("Неправильный ввод, повторите попытку!\n")
@@ -12,7 +16,11 @@ def input_h() -> str:
 
 
 def calculate_inversions(state):
-    """Функция для подсчета порядка перестановки."""
+    """
+    Функция для подсчета порядка перестановки.
+    :param state: Состояние, в котором будут считаться инверсии.
+    :return: Общее количество инверсий в state.
+    """
     inversions = 0  # Инициализация счетчика инверсий
     # Создание плоского списка состояния игры без пустых ячеек (значения 0)
     flattened_state = [cell for row in state for cell in row if cell != 0]
@@ -23,19 +31,41 @@ def calculate_inversions(state):
             # увеличиваем счетчик инверсий
             if flattened_state[i] > flattened_state[j]:
                 inversions += 1
-    return inversions  # Возвращаем общее количество инверсий в состоянии игры
+    return inversions
 
 
 def solution_exists(start_state, end_state):
-    """Функция для проверки наличия решения."""
+    """
+    Функция для проверки наличия решения.
+    :param start_state: Корень дерева.
+    :param end_state: Искомое состояние в дереве.
+    :return: Существует ли путь от start_state к end_state.
+    """
     # Вычисление количества инверсий для начального и конечного состояний
     start_inversions = calculate_inversions(start_state)
     end_inversions = calculate_inversions(end_state)
     # Проверка, имеют ли оба состояния одинаковый остаток от деления количества инверсий на 2
     if start_inversions % 2 == end_inversions % 2:
         return True  # Решение существует
+    return False  # Решение не существует
+
+
+def search_start(greedy_mode: bool):
+    """
+    Функция запуска поиска.
+    :param greedy_mode: True, если будет запущен жадный поиск, False, если А*.
+    """
+    debug_flag = input("\nРежим пошагового вывода (Y/N):\n> ") == 'Y'
+    h_flag = input_h()
+
+    start_state = get_initial_state()
+    end_state = get_finish_state()
+
+    if solution_exists(start_state, end_state):
+        print("Решение существует!")
+        search(debug_flag, h_flag=int(h_flag), greedy_flag=greedy_mode)
     else:
-        return False  # Решение не существует
+        print("Решения не существует.")
 
 
 if __name__ == '__main__':
@@ -49,31 +79,9 @@ if __name__ == '__main__':
 
         match mode:
             case '1':
-                debug_flag = input("\nРежим пошагового вывода (Y/N):\n> ") == 'Y'
-                h_flag = input_h()
-                
-                start_state = get_initial_state()
-                end_state = get_finish_state()
-
-                if solution_exists(start_state, end_state):
-                    print("Решение существует!")
-                    search(debug_flag, h_flag=int(h_flag))
-                else:
-                    print("Решения не существует.")
-                    
+                search_start(False)
             case '2':
-                debug_flag = input("\nРежим пошагового вывода (Y/N):\n> ") == 'Y'
-                h_flag = input_h()
-                
-                start_state = get_initial_state()
-                end_state = get_finish_state()
-
-                if solution_exists(start_state, end_state):
-                    print("Решение существует!")
-                    search(debug_flag, h_flag=int(h_flag), greedy_flag = True)
-                else:
-                    print("Решение не существует.")
-                    
+                search_start(True)
             case '3':
                 print(tabulate(
                     [["A*",
