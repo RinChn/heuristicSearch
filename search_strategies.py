@@ -69,17 +69,24 @@ def h2(state: list) -> int:
 
     return total_distance
 
+
+h_func = {1: h1, 2: h2}
+
+
 def search(debug_flag: int, h_flag: int = None, greedy_flag: bool = None):
     """
     Поиск А*: подготовка структур данных, запуск поиска.
+    :param greedy_flag: Флаг выбора жадного поиска
     :param debug_flag: Выбор пользователя относительно пошагового вывода поиска.
-    :greedy_flag: Флаг выбора жадного поиска
     :param h_flag: Флаг выбора эвристической функции.
     """
     global DEBUG
     DEBUG = debug_flag
 
-    print("\n\nЭВРИСТИЧЕСКИЙ ПОИСК А*.")
+    if greedy_flag:
+        print("\n\nЖАДНЫЙ ПОИСК.")
+    else:
+        print("\n\nЭВРИСТИЧЕСКИЙ ПОИСК А*.")
 
     start_node = Node(get_initial_state(), None, None, 0, 0, 0)  # Начальный узел
     visited_states = set()  # Множество посещенных состояний
@@ -88,7 +95,7 @@ def search(debug_flag: int, h_flag: int = None, greedy_flag: bool = None):
     iterations = 0  # Счетчик итераций
 
     start_time = process_time()
-   
+
     # Основной цикл алгоритма
     while queue:
         result_node, iterations = defining_sequences(queue.pop(0), visited_states, queue, iterations,
@@ -101,11 +108,18 @@ def search(debug_flag: int, h_flag: int = None, greedy_flag: bool = None):
     print_path(result_node)
     print("Информация о поиске:")
     print_info(iterations=iterations, time=time_stop - start_time, visited_states=len(visited_states),
-                path_cost=result_node.path_cost)
+               path_cost=result_node.path_cost)
+
+
+def defining_heuristic_node(h_numb: int, current_node: "Node", greedy_flag: bool):
+    current_node.node_f = h_func[h_numb](current_node.current_state)
+    if not greedy_flag:
+        current_node.node_f += current_node.path_cost
+
 
 def defining_sequences(current_node: "Node", visited_states: set,
                        queue: list, iterations: int,
-                       h_flag: int = None, greedy_flag: bool = None):
+                       h_flag: int = 0, greedy_flag: bool = False):
     """
     Рекурсивная часть алгоритма поиска А* с учетом выбранной эвристики.
     :param current_node: Текущий обрабатываемый узел.
@@ -113,7 +127,7 @@ def defining_sequences(current_node: "Node", visited_states: set,
     :param queue: Очередь узлов.
     :param iterations: Количество прошедших итераций.
     :param h_flag: Флаг выбора эвристической функции.
-    :greedy_flag: Флаг выбора жадного поиска
+    :param greedy_flag: Флаг выбора жадного поиска
     :return: Найденное конечное состояние и затраченное для этого количество итераций.
     """
     iterations += 1  # Увеличиваем счетчик итераций
@@ -130,7 +144,8 @@ def defining_sequences(current_node: "Node", visited_states: set,
 
     # Получаем новые состояния из текущего узла
     new_states_dict = get_followers(current_node.current_state)
-
+    if iterations == 1:
+        defining_heuristic_node(h_flag, current_node, greedy_flag)
     # Отладочный вывод текущего узла и всех его потомков по шагам
     if DEBUG:
         print(f"\n----------------Шаг {iterations}.---------------- \n")
@@ -138,71 +153,42 @@ def defining_sequences(current_node: "Node", visited_states: set,
         if iterations == 1:
             print("Корень дерева")
         print_node(current_node)
-        if h_flag == 1 and greedy_flag == True:
-            if iterations == 1:
-                current_node.node_f = h1(current_node.current_state)
-            print("Значение h1:", current_node.node_f)        
-        elif h_flag == 2 and greedy_flag == True:
-            if iterations == 1:
-                current_node.node_f = h2(current_node.current_state)
-            print("\nЗначение h2:", current_node.node_f) 
-        elif h_flag == 1:
-            if iterations == 1:
-                current_node.node_f = h1(current_node.current_state) + current_node.path_cost
-            print("Значение f-стоимости с h1:", current_node.node_f) 
-        elif h_flag == 2:
-            if iterations == 1:
-                current_node.node_f = h2(current_node.current_state) + current_node.path_cost
-            print("\nЗначение f-стоимости с h2:", current_node.node_f) 
+        print(f"Значение{' ' if greedy_flag else ' f-стоимости с '}h{h_flag}:",
+              current_node.node_f)
         print("\nПотомки:")
 
     # Исследуем каждого потомка
     for child_action, child_state in new_states_dict.items():
         # Хэшируем состояние и инициализируем как узел
         child_hash_value = state_hash(child_state)
-        
         child_node = Node(child_state, current_node, child_action, current_node.path_cost + 1,
-                    current_node.depth + 1, 0)
-    
+                          current_node.depth + 1, 0)
+        defining_heuristic_node(h_flag, child_node, greedy_flag)
+
         if child_hash_value not in visited_states:
+
             if DEBUG:
                 print_node(child_node)  # Выводим информацию о потомке
-                
-            if h_flag == 1 and greedy_flag == True:
-                child_node.node_f = h1(child_node.current_state)
-                if DEBUG:
-                    print("Значение h1:", child_node.node_f)        
-            elif h_flag == 2 and greedy_flag == True:
-                child_node.node_f = h2(child_node.current_state)
-                if DEBUG:
-                    print("\nЗначение h2:", child_node.node_f) 
-            elif h_flag == 1:
-                child_node.node_f = h1(child_node.current_state) + child_node.path_cost
-                if DEBUG:
-                    print("Значение f-стоимости с h1:", child_node.node_f) 
-            elif h_flag == 2:
-                child_node.node_f = h2(child_node.current_state) + child_node.path_cost
-                if DEBUG:
-                    print("\nЗначение f-стоимости с h2:", child_node.node_f) 
+                print(f"Значение{' ' if greedy_flag else ' f-стоимости с '}h{h_flag}:",
+                      child_node.node_f)
             if DEBUG:
                 print()
-            
-            # сравнение эвристик потомка и родитля для A* || жадного поиска 
-            if child_node.node_f >= current_node.node_f or (greedy_flag == True and child_node.node_f <= current_node.node_f): 
-                queue.append(child_node)  # Помещаем узел в очередь
-            else:
-                if DEBUG:
-                    print("\nf-стоимость потомка НИЖЕ f-стоимости родителя")
-                
-        else:   
+
+            if greedy_flag and child_node.node_f < current_node.node_f:
+                child_node.node_f = max(child_node.node_f, current_node.node_f)
+
+            queue.append(child_node)  # Помещаем узел в очередь
+
+        else:
             if DEBUG:
                 print(f"\nПовторное состояние: \nAction = {MOVES[child_action]}, \nState: ")
                 print_state(child_state)
                 print()
 
-            #Если новое состояние уже присутствует в очереди, но такой узел имеет большую стоимость пути, чем текущий потомок
+            # Если новое состояние уже присутствует в очереди,
+            # но такой узел имеет большую стоимость пути, чем текущий потомок
             for node in queue:
-                if node.current_state == child_node.current_state and node.path_cost < child_node.path_cost :
+                if node.current_state == child_node.current_state and node.path_cost < child_node.path_cost:
                     # то информация о таком узле в очереди обновляется
                     node.depth = child_node.depth
                     node.parent_node = current_node
@@ -210,18 +196,19 @@ def defining_sequences(current_node: "Node", visited_states: set,
                     node.node_f = node.node_f - node.path_cost + child_node.path_cost
                     node.path_cost = child_node.path_cost
                     break
-                
+
     if DEBUG:
         input("\nНажмите 'Enter' для продолжения...")
-        
+
     # Сортировка в соответствии с выбранной функцией h в обратном порядке
     # (приоритет - состояние суммой наименьшего з-я эвристической ф-ции и стоимости пути до тек. узла) 
     queue = sorted(queue, key=lambda item: item.node_f)
 
     # Рекурсивно переходим к обработке полученных потомков, удаляя их постепенно из очереди
     while queue:
-        result_node, iterations = defining_sequences(queue.pop(0), visited_states, queue, iterations, h_flag, greedy_flag)
+        result_node, iterations = defining_sequences(queue.pop(0), visited_states, queue, iterations, h_flag,
+                                                     greedy_flag)
         if result_node is not None:
-            return result_node, iterations  
+            return result_node, iterations
 
     return None, iterations

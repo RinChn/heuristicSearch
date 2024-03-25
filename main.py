@@ -2,12 +2,14 @@ from tabulate import tabulate
 from search_strategies import search
 from basic_operations import get_initial_state, get_finish_state
 
+
 def input_h() -> str:
     h = input("\nЭвристическая функция h: (1/2)\n> ")
     while h != '1' and h != '2':
         print("Неправильный ввод, повторите попытку!\n")
         h = input("\nЭвристическая функция h: (1/2)\n> ")
     return h
+
 
 def calculate_inversions(state):
     """Функция для подсчета порядка перестановки."""
@@ -17,10 +19,12 @@ def calculate_inversions(state):
     # Перебор всех пар элементов в плоском списке
     for i in range(len(flattened_state)):
         for j in range(i + 1, len(flattened_state)):
-            # Если порядок элементов в паре нарушен (более большой элемент идет перед меньшим), увеличиваем счетчик инверсий
+            # Если порядок элементов в паре нарушен (более большой элемент идет перед меньшим),
+            # увеличиваем счетчик инверсий
             if flattened_state[i] > flattened_state[j]:
                 inversions += 1
     return inversions  # Возвращаем общее количество инверсий в состоянии игры
+
 
 def solution_exists(start_state, end_state):
     """Функция для проверки наличия решения."""
@@ -32,6 +36,7 @@ def solution_exists(start_state, end_state):
         return True  # Решение существует
     else:
         return False  # Решение не существует
+
 
 if __name__ == '__main__':
     repeat = 'Y'
@@ -54,7 +59,7 @@ if __name__ == '__main__':
                     print("Решение существует!")
                     search(debug_flag, h_flag=int(h_flag))
                 else:
-                    print("Решение не существует.")
+                    print("Решения не существует.")
                     
             case '2':
                 debug_flag = input("\nРежим пошагового вывода (Y/N):\n> ") == 'Y'

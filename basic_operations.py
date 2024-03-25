@@ -74,7 +74,7 @@ def print_node(node: "Node"):
 
     node_prev_action = None
     if node.previous_action:
-        node_prev_action = MOVES[*node.previous_action]
+        node_prev_action = MOVES[node.previous_action]
 
     print(f"ID = {node.node_id}, ParentID = {parent_id}, " +
           f"Action = {node_prev_action}, \nDepth = {node.depth}, " +
