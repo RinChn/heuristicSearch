@@ -195,7 +195,7 @@ def defining_sequences(current_node: "Node", visited_states: set,
                     if DEBUG:
                         print("Узел в очереди с этим же состоянием заменен на этого потомка из-за оценки стоимости.")
                     break
-                if child_node.cost_estimation >= node.cost_estimation:
+                if child_node.cost_estimation > node.cost_estimation:
                     break
 
     if DEBUG:
