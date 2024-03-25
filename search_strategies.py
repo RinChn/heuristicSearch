@@ -73,6 +73,7 @@ def search(debug_flag: int, h_flag: int = None, greedy_flag: bool = None):
     """
     Поиск А*: подготовка структур данных, запуск поиска.
     :param debug_flag: Выбор пользователя относительно пошагового вывода поиска.
+    :greedy_flag: Флаг выбора жадного поиска
     :param h_flag: Флаг выбора эвристической функции.
     """
     global DEBUG
@@ -112,6 +113,7 @@ def defining_sequences(current_node: "Node", visited_states: set,
     :param queue: Очередь узлов.
     :param iterations: Количество прошедших итераций.
     :param h_flag: Флаг выбора эвристической функции.
+    :greedy_flag: Флаг выбора жадного поиска
     :return: Найденное конечное состояние и затраченное для этого количество итераций.
     """
     iterations += 1  # Увеличиваем счетчик итераций
@@ -165,7 +167,6 @@ def defining_sequences(current_node: "Node", visited_states: set,
         if child_hash_value not in visited_states:
             if DEBUG:
                 print_node(child_node)  # Выводим информацию о потомке
-             
                 
             if h_flag == 1 and greedy_flag == True:
                 child_node.node_f = h1(child_node.current_state)
@@ -186,8 +187,8 @@ def defining_sequences(current_node: "Node", visited_states: set,
             if DEBUG:
                 print()
             
-            
-            if child_node.node_f >= current_node.node_f or greedy_flag == True: # Является ли оценочная стоимость потомка не ниже родителя
+            # сравнение эвристик потомка и родитля для A* || жадного поиска 
+            if child_node.node_f >= current_node.node_f or (greedy_flag == True and child_node.node_f <= current_node.node_f): 
                 queue.append(child_node)  # Помещаем узел в очередь
             else:
                 if DEBUG:
@@ -199,16 +200,16 @@ def defining_sequences(current_node: "Node", visited_states: set,
                 print_state(child_state)
                 print()
 
-            # Если состояние потомка не повторяет состояние родителя текущего узла  
-            if child_node.current_state != current_node.parent_node.current_state:
-                if child_node.node_f >= current_node.node_f: 
-                    """print("\n!!!!")
-                    print_state(child_node.current_state)
-                    print_state(current_node.parent_node.current_state)"""
-                    queue.append(child_node) # Добавим, если путь через текущий узел к этому состоянию окажется короче при переоценке в A*
-                else:
-                    if DEBUG:
-                        print("\nf-стоимость потомка НИЖЕ f-стоимости родителя")
+            #Если новое состояние уже присутствует в очереди, но такой узел имеет большую стоимость пути, чем текущий потомок
+            for node in queue:
+                if node.current_state == child_node.current_state and node.path_cost < child_node.path_cost :
+                    # то информация о таком узле в очереди обновляется
+                    node.depth = child_node.depth
+                    node.parent_node = current_node
+                    node.previous_action = child_node.previous_action
+                    node.node_f = node.node_f - node.path_cost + child_node.path_cost
+                    node.path_cost = child_node.path_cost
+                    break
                 
     if DEBUG:
         input("\nНажмите 'Enter' для продолжения...")
