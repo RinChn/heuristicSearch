@@ -112,9 +112,9 @@ def search(debug_flag: int, h_flag: int = None, greedy_flag: bool = None):
 
 
 def defining_heuristic_node(h_numb: int, current_node: "Node", greedy_flag: bool):
-    current_node.heuristic_function = h_func[h_numb](current_node.current_state)
+    current_node.cost_estimation = h_func[h_numb](current_node.current_state)
     if not greedy_flag:
-        current_node.heuristic_function += current_node.path_cost
+        current_node.cost_estimation += current_node.path_cost
 
 
 def defining_sequences(current_node: "Node", visited_states: set,
@@ -153,8 +153,6 @@ def defining_sequences(current_node: "Node", visited_states: set,
         if iterations == 1:
             print("Корень дерева")
         print_node(current_node)
-        print(f"Значение{' ' if greedy_flag else ' f-стоимости с '}h{h_flag}:",
-              current_node.heuristic_function)
         print("\nПотомки:")
 
     # Исследуем каждого потомка
@@ -169,13 +167,11 @@ def defining_sequences(current_node: "Node", visited_states: set,
 
             if DEBUG:
                 print_node(child_node)  # Выводим информацию о потомке
-                print(f"Значение{' ' if greedy_flag else ' f-стоимости с '}h{h_flag}:",
-                      child_node.heuristic_function)
             if DEBUG:
                 print()
 
-            if greedy_flag and child_node.heuristic_function < current_node.heuristic_function:
-                child_node.heuristic_function = max(child_node.heuristic_function, current_node.heuristic_function)
+            if greedy_flag and child_node.cost_estimation < current_node.cost_estimation:
+                child_node.cost_estimation = max(child_node.cost_estimation, current_node.cost_estimation)
 
             queue.append(child_node)  # Помещаем узел в очередь
 
@@ -193,7 +189,7 @@ def defining_sequences(current_node: "Node", visited_states: set,
                     node.depth = child_node.depth
                     node.parent_node = current_node
                     node.previous_action = child_node.previous_action
-                    node.heuristic_function = node.heuristic_function - node.path_cost + child_node.path_cost
+                    node.cost_estimation = node.cost_estimation - node.path_cost + child_node.path_cost
                     node.path_cost = child_node.path_cost
                     break
 
@@ -202,7 +198,7 @@ def defining_sequences(current_node: "Node", visited_states: set,
 
     # Сортировка в соответствии с выбранной функцией h в обратном порядке
     # (приоритет - состояние суммой наименьшего з-я эвристической ф-ции и стоимости пути до тек. узла) 
-    queue = sorted(queue, key=lambda item: item.heuristic_function)
+    queue = sorted(queue, key=lambda item: item.cost_estimation)
 
     # Рекурсивно переходим к обработке полученных потомков, удаляя их постепенно из очереди
     while queue:

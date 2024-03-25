@@ -80,6 +80,7 @@ def print_node(node: "Node"):
           f"Action = {node_prev_action}, \nDepth = {node.depth}, " +
           f"Cost = {node.path_cost}, \nState: ")
     print_state(node.current_state)
+    print(f"Значение оценочной стоимости узла:", node.cost_estimation)
 
 
 def print_state(state: list):

@@ -8,7 +8,7 @@ class Node:
     path_cost: int = 0  # Стоимость пути от начального узла к данному
     depth: int = 0  # Глубина узла
     id: int = 0  # ID узла (его индекс в общем массиве узлов)
-    heuristic_function: int = 0  # Значение эвристической функции узла
+    cost_estimation: int = 0  # Значение оценки стоимости узла
     
     nodes_count = 0  # Общее количество представителей класса
 
@@ -27,7 +27,7 @@ class Node:
         self.path_cost = cost
         self.depth = depth
         self.id = Node.nodes_count
-        self.heuristic_function = f
+        self.cost_estimation = f
 
         Node.nodes_count += 1
 
