@@ -2,7 +2,7 @@ class Node:
     """
     Класс представления узла.
     """
-    current_state: list = None  # Текущее состояние
+    state: list = None  # Текущее состояние
     parent_node: "Node" = None  # Указатель на родительский узел
     previous_action: tuple = None  # Действие, применённое к родительскому узлу для получения текущего узла
     path_cost: int = 0  # Стоимость пути от начального узла к данному
@@ -21,7 +21,7 @@ class Node:
         :param cost: Стоимость.
         :param depth: Глубина.
         """
-        self.current_state = state
+        self.state = state
         self.parent_node = parent
         self.previous_action = action
         self.path_cost = cost

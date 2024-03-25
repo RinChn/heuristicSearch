@@ -21,14 +21,13 @@ def calculate_inversions(state):
     :param state: Состояние, в котором будут считаться инверсии.
     :return: Общее количество инверсий в state.
     """
-    inversions = 0  # Инициализация счетчика инверсий
-    # Создание плоского списка состояния игры без пустых ячеек (значения 0)
+    inversions = 0  # Счетчик инверсий
     flattened_state = [cell for row in state for cell in row if cell != 0]
-    # Перебор всех пар элементов в плоском списке
+
+    # Перебор всех пар элементов в списке
     for i in range(len(flattened_state)):
         for j in range(i + 1, len(flattened_state)):
-            # Если порядок элементов в паре нарушен (более большой элемент идет перед меньшим),
-            # увеличиваем счетчик инверсий
+            # Если более большой элемент идет перед меньшим, увеличиваем счетчик инверсий
             if flattened_state[i] > flattened_state[j]:
                 inversions += 1
     return inversions
@@ -44,6 +43,7 @@ def solution_exists(start_state, end_state):
     # Вычисление количества инверсий для начального и конечного состояний
     start_inversions = calculate_inversions(start_state)
     end_inversions = calculate_inversions(end_state)
+
     # Проверка, имеют ли оба состояния одинаковый остаток от деления количества инверсий на 2
     if start_inversions % 2 == end_inversions % 2:
         return True  # Решение существует

@@ -20,16 +20,16 @@ def get_initial_state() -> list:
     # Замена любых двух ячеек приводит к решению.
     #
     # Например:
-    # return [
-    #     [5, 6, 4],
-    #     [2, 3, 8],
-    #     [7, 1, 0]
-    # ]
     return [
-        [3, 6, 4],
-        [2, 5, 8],
+        [5, 6, 4],
+        [2, 3, 8],
         [7, 1, 0]
     ]
+    # return [
+    #     [3, 6, 4],
+    #     [2, 5, 8],
+    #     [7, 1, 0]
+    # ]
 
 
 def get_finish_state() -> list:
@@ -79,7 +79,7 @@ def print_node(node: "Node"):
     print(f"ID = {node.id}, ParentID = {parent_id}, " +
           f"Action = {node_prev_action}, \nDepth = {node.depth}, " +
           f"Cost = {node.path_cost}, \nState: ")
-    print_state(node.current_state)
+    print_state(node.state)
     print(f"Значение оценочной стоимости узла:", node.cost_estimation)
 
 

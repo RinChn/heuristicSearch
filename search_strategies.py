@@ -112,7 +112,7 @@ def search(debug_flag: int, h_flag: int = None, greedy_flag: bool = None):
 
 
 def defining_heuristic_node(h_numb: int, current_node: "Node", greedy_flag: bool):
-    current_node.cost_estimation = h_func[h_numb](current_node.current_state)
+    current_node.cost_estimation = h_func[h_numb](current_node.state)
     if not greedy_flag:
         current_node.cost_estimation += current_node.path_cost
 
@@ -133,17 +133,17 @@ def defining_sequences(current_node: "Node", visited_states: set,
     iterations += 1  # Увеличиваем счетчик итераций
 
     # Проверяем, достигнуто ли конечное состояние
-    if check_final(current_node.current_state):
+    if check_final(current_node.state):
         return current_node, iterations
 
     # Хэшируем текущее состояние для проверки посещенных состояний
-    state_hash_value = state_hash(current_node.current_state)
+    state_hash_value = state_hash(current_node.state)
 
     # Добавляем текущее состояние в множество посещенных
     visited_states.add(state_hash_value)
 
     # Получаем новые состояния из текущего узла
-    new_states_dict = get_followers(current_node.current_state)
+    new_states_dict = get_followers(current_node.state)
     if iterations == 1:
         defining_heuristic_node(h_flag, current_node, greedy_flag)
     # Отладочный вывод текущего узла и всех его потомков по шагам
@@ -177,27 +177,32 @@ def defining_sequences(current_node: "Node", visited_states: set,
 
         else:
             if DEBUG:
-                print(f"\nПовторное состояние: \nAction = {MOVES[child_action]}, \nState: ")
+                print(f"\nПовторное состояние: \nСтоимость = {child_node.cost_estimation}\n"
+                      f"Action = {MOVES[child_action]}, \nState: ")
                 print_state(child_state)
                 print()
 
             # Если новое состояние уже присутствует в очереди,
-            # но такой узел имеет большую стоимость пути, чем текущий потомок
+            # но такой узел имеет большую стоимость пути, чем текущий потомок,
+            # то информация о таком узле в очереди обновляется
             for node in queue:
-                if node.current_state == child_node.current_state and node.path_cost < child_node.path_cost:
-                    # то информация о таком узле в очереди обновляется
+                if node.state == child_node.state and node.path_cost > child_node.path_cost:
                     node.depth = child_node.depth
                     node.parent_node = current_node
                     node.previous_action = child_node.previous_action
                     node.cost_estimation = node.cost_estimation - node.path_cost + child_node.path_cost
                     node.path_cost = child_node.path_cost
+                    if DEBUG:
+                        print("Узел в очереди с этим же состоянием заменен на этого потомка из-за оценки стоимости.")
+                    break
+                if child_node.cost_estimation >= node.cost_estimation:
                     break
 
     if DEBUG:
         input("\nНажмите 'Enter' для продолжения...")
 
     # Сортировка в соответствии с выбранной функцией h в обратном порядке
-    # (приоритет - состояние суммой наименьшего з-я эвристической ф-ции и стоимости пути до тек. узла) 
+    # (приоритет - состояние с наименьшей оценкой стоимости)
     queue = sorted(queue, key=lambda item: item.cost_estimation)
 
     # Рекурсивно переходим к обработке полученных потомков, удаляя их постепенно из очереди
