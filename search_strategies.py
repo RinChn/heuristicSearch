@@ -169,7 +169,7 @@ def defining_sequences(current_node: "Node", visited_states: set,
                 print_node(child_node)  # Выводим информацию о потомке
                 print()
 
-            if greedy_flag and child_node.cost_estimation < current_node.cost_estimation:
+            if not greedy_flag and child_node.cost_estimation < current_node.cost_estimation:
                 child_node.cost_estimation = max(child_node.cost_estimation, current_node.cost_estimation)
 
             queue.append(child_node)  # Помещаем узел в очередь
