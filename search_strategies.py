@@ -169,7 +169,7 @@ def defining_sequences(current_node: "Node", visited_states: set,
                 print_node(child_node)  # Выводим информацию о потомке
                 print()
 
-            # Выравнивание стоимости для восстановления монотонности эвристики в A*
+            # Выравниваем стоимость для восстановления монотонности эвристики в A*
             if not greedy_flag and child_node.cost_estimation < current_node.cost_estimation:
                 child_node.cost_estimation = max(child_node.cost_estimation, current_node.cost_estimation)
 
