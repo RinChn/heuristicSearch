@@ -2,8 +2,9 @@ import sys
 from time import process_time
 
 from node import Node
-from basic_operations import print_info, check_final, state_hash, \
-    get_followers, print_state, print_node, print_path, get_initial_state, get_finish_state, MOVES, get_coordinates_cell
+from basic_operations import (print_info, check_final, state_hash,
+                              get_followers, print_state, print_node, print_path, get_initial_state,
+                              get_finish_state, MOVES, get_coordinates_cell)
 
 sys.setrecursionlimit(1000000)  # Предел рекурсии
 DEBUG = False
@@ -89,6 +90,7 @@ def search(debug_flag: int, h_flag: int = None, greedy_flag: bool = None):
         print("\n\nЭВРИСТИЧЕСКИЙ ПОИСК А*.")
 
     start_node = Node(get_initial_state(), None, None, 0, 0, 0)  # Начальный узел
+    defining_heuristic_node(h_flag, start_node, greedy_flag)
     visited_states = set()  # Множество посещенных состояний
     queue = [start_node]  # Очередь с приоритетом для хранения узлов
     result_node = None  # Переменная для хранения результата
@@ -112,6 +114,12 @@ def search(debug_flag: int, h_flag: int = None, greedy_flag: bool = None):
 
 
 def defining_heuristic_node(h_numb: int, current_node: "Node", greedy_flag: bool):
+    """
+    Определение значения оценки стоимости узла.
+    :param h_numb: Номер используемой эвристической функции.
+    :param current_node: Текущий узел, для которого будет определена оценка стоимости.
+    :param greedy_flag: Флаг жадного алгоритма: True, если алгоритм жадный, False, если А*.
+    """
     current_node.cost_estimation = h_func[h_numb](current_node.state)
     if not greedy_flag:
         current_node.cost_estimation += current_node.path_cost
@@ -144,8 +152,6 @@ def defining_sequences(current_node: "Node", visited_states: set,
 
     # Получаем новые состояния из текущего узла
     new_states_dict = get_followers(current_node.state)
-    if iterations == 1:
-        defining_heuristic_node(h_flag, current_node, greedy_flag)
     # Отладочный вывод текущего узла и всех его потомков по шагам
     if DEBUG:
         print(f"\n----------------Шаг {iterations}.---------------- \n")
@@ -201,7 +207,7 @@ def defining_sequences(current_node: "Node", visited_states: set,
     if DEBUG:
         input("\nНажмите 'Enter' для продолжения...")
 
-    # Сортировка в соответствии с выбранной функцией h в обратном порядке
+    # Сортировка в соответствии с оценкой стоимости
     # (приоритет - состояние с наименьшей оценкой стоимости)
     queue = sorted(queue, key=lambda item: item.cost_estimation)
 
