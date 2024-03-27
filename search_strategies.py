@@ -76,7 +76,7 @@ h_func = {1: h1, 2: h2}
 
 def search(debug_flag: int, h_flag: int = None, greedy_flag: bool = None):
     """
-    Поиск А*: подготовка структур данных, запуск поиска.
+    Начало поиска: подготовка структур данных, запуск поиска.
     :param greedy_flag: Флаг выбора жадного поиска
     :param debug_flag: Выбор пользователя относительно пошагового вывода поиска.
     :param h_flag: Флаг выбора эвристической функции.
@@ -129,7 +129,7 @@ def defining_sequences(current_node: "Node", visited_states: set,
                        queue: list, iterations: int,
                        h_flag: int = 0, greedy_flag: bool = False):
     """
-    Рекурсивная часть алгоритма поиска А* с учетом выбранной эвристики.
+    Рекурсивная часть алгоритма поиска с учетом выбранной эвристики.
     :param current_node: Текущий обрабатываемый узел.
     :param visited_states: Список посещённых состояний.
     :param queue: Очередь узлов.
